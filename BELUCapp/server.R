@@ -109,15 +109,16 @@ shinyServer(function(input, output) {
     std
     
   },
-  width='90%',
+  width='100%',
   striped=T, bordered=T, align='c', rownames=F)
   
-  output$luc_freqA <- renderTable(luc_freq, 
-    width='90%',
+  output$luc_freqA <- renderTable(
+    head(luc_freq[order(luc_freq$frequency, decreasing=T),],10), 
+    width='100%', digits=3,
     striped=T, bordered=T, align='c', rownames=F)
   
   output$av_persistA <- renderTable(av_persist, 
-    width='90%',
+    width='100%', digits=3,
     striped=T, bordered=T, align='c', rownames=F)
   
   output$spatial_varA <- renderTable(spatial_var, 

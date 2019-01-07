@@ -1,0 +1,8 @@
+# About this Shiny App
+
+This Shiny app provides a way of exploring and evaluating the Bayesian approach to estimating land use change (BELUC), as published by Levy, <em>et al.</em> (2018). The main purpose is to list assumptions and parameter settings, and show model output summaries based on the choices of parameter and dataset.
+
+The outputs here have been pre-computed, hence the results are restricted to adjusting one variable at a time.
+
+## Funding
+This work was supported by the Natural Environment Research Council award number NE/R016429/1 as part of the UK-SCAPE programme delivering National Capability.

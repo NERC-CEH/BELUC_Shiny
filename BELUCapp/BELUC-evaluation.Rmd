@@ -1,4 +1,3 @@
-<!---
 ---
 title: "Bayesian Estimation of Land-Use Change"
 subtitle: "(UK-SCaPE 1.1)"
@@ -6,20 +5,20 @@ author:
 - Van Oijen, M., Buys, G., Cameron, D., Griffin, A., Keith, A., Levy, P.
 date: '`r Sys.Date()`'
 output:
+  html_document: default
   pdf_document:
     fig_caption: yes
     keep_tex: no
     number_sections: yes
     toc: yes
-  html_document: default
   word_document:
     reference_docx: word-styles-reference-01.docx
 fontsize: 11pt
-geometry: margin=1in
-csl: environmental-modelling-and-software.csl
+#geometry: margin=1in
+#csl: environmental-modelling-and-software.csl
 bibliography: BayesianLUC.bib
 ---
---->
+
 
 # Introduction
 
