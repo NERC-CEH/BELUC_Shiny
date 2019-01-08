@@ -10,11 +10,12 @@
 # TODO: split model and project information into two markdown files. Needs
 # placeholder for figures?
 
-
 library(shiny)
-library(shinythemes)
+library(ggplot2)
+library(shinyWidgets)
+
 library(htmltools)
-library(leaflet)
+
 library(markdown)
 library(knitr)
 
@@ -48,15 +49,15 @@ shinyUI(
   fluidPage(
     fluidRow(
       column(width = 3,
-      img(src = "CEH_RGB_PMS.png",width = "290",height = "70",
-          style="margin:10px 0px")),
+             img(src = "CEH_RGB_PMS.png",width = "290",height = "70",
+                 style="margin:10px 0px")),
       
       column(width=5, h2("Bayesian Estimation of Land Use Change")),
       
       column(width = 4,
-      img(src = "UK_SCAPE_Logo_Positive.png",width = "368",height = "70",
-          style="margin:10px 0px"))
-      ),
+             img(src = "UK_SCAPE_Logo_Positive.png",width = "368",height = "70",
+                 style="margin:10px 0px"))
+    ),
     
     #titlePanel("Bayesian Estimation of Land Use Change"),
     
@@ -64,122 +65,100 @@ shinyUI(
       width = 12,
       navbarPage("BELUC",
                  
-        #### PARAMETERS AND SUMMARY TAB         
-        tabPanel("Plot",
-          fluidPage(
-            fluidRow(
-              column(width = 4,
-                wellPanel(     
-                 # Column containing user choices and initial parameters.
-                 h2("Parameter choices"),
-                 helpText("Select the parameter you wish to scale, followed by",
-"the scaling factor you wish to use. The table below will reflect the selected",
-"values for the model parameters. Check the boxes for the datasets you wish to",
-"be included, and the values will automatically update with each change.", 
-"For explanations of abbreviations, see the Model tab."),
-                 selectInput("parameter_group",
-                     "Choice of parameter to scale",
-                     choices = list(
-                       "SD_LUC" = 1,
-                       "SD_NET" = 2,
-                       "SD_GROSS" = 3,
-                       "SD_PRED" = 4),
-                     selected = 1),
-                   
-                   h4("Prior variance choices"),
-                   radioButtons(
-                     "scaling_factor",
-                     "Scaling factor",
-                     choices = list("0.1" = 1,
-                                    "1" = 2,
-                                    "10" = 3),
-                     selected = 2),
-                 
-                   tableOutput("factorOAAT"),
-                 
-                   textOutput("scaling_factor"),
-                 
-                 h2("Dataset choices"),
-                 helpText("Select the datasets you wish to include in this",
-                          "evaluation of the model."),
-                 checkboxGroupInput("dataset_checkbox",
-                                    "Datasets included:",
-                                    choiceNames = datasets_full,
-                                    choiceValues = datasets_initials,
-                                    selected = datasets_initials, 
-                                    width="90%")
-              )),
+         #### PARAMETERS AND SUMMARY TAB ####
+         tabPanel("Plot",
+            fluidPage(
+              fluidRow(
+                column(width = 4, # User choices and initial parameters 
+                   wellPanel(
                      
-              column(width = 3,
+                     h2("Dataset choices"),
+                     helpText("Select the datasets you wish to include in this",
+                              "evaluation of the model."),
+                     checkboxGroupInput("dataset_checkbox",
+                                        "Datasets included:",
+                                        choiceNames = datasets_full,
+                                        choiceValues = datasets_initials,
+                                        selected = datasets_initials, 
+                                        width="90%"),
                      
-                # Column containing resultant tables/graphs
-                h3(paste("Summary of Land Use Change")),
+                     h2("Parameter scaling choices"),
+
+                     uiOutput("LUC_s"), # This appear if applicable due to 
+                     uiOutput("NET_s"), # dataset choices
+                     uiOutput("GROSS_s"),
+                     uiOutput("PRED_s"),
+                     
+                     tableOutput("factorOAAT")
+                     
+                   )),
                 
-                h4("Most frequent land use changes"),
-                tableOutput("luc_freqA"),
                 
-                h4("Average proportion of land use types"),
-                tableOutput("av_persistA")
-                
+                column(width = 3,
+                       
+                       # Column containing resultant tables/graphs
+                       h3(paste("Summary of Land Use Change")),
+                       
+                       h4("Most frequent land use changes"),
+                       tableOutput("luc_freqA"),
+                       
+                       h4("Average proportion of land use types"),
+                       tableOutput("av_persistA")
+                       
                 ),
-              column(width = 5,
-
-                # Column containing resultant tables/graphs
-                h3("Spatial variability over time"),
-                
-                #tableOutput("spatial_varA")
-                plotOutput("spatial_plot")
-
-
-              )
+                column(width = 5,
+                       
+                       # Column containing resultant tables/graphs
+                       h3("Spatial variability over time"),
+                       
+                       #tableOutput("spatial_varA")
+                       plotOutput("spatial_plot")
+                       
+                )
               )
             )
-          ),
-        
-        #### MAP/REALISATION TAB ####
-        tabPanel("Map Simulation",
-                 fluidPage(
-                   fluidRow(
-                     column(width = 6,
-                            
-                            helpText("Map showing possible realisation?")
-                            
-                     )
-                   )
-                 )
-        ),
-          
-        #### MODEL TAB ####
-        tabPanel("Model",
-           fluidPage(
-             fluidRow(
-               column(width = 12,
-                      
-               #helpText(paste("Words about the model. Replace with",
-              #          "withMathJax(includeHTML('BELUC-evaluation.html'))"))
-               
-               withMathJax(includeHTML('modelpage.html'))
-               
-               )
-               )
-             )
-           ), 
-        
-        #### ABOUT TAB ####
-        tabPanel("About",
-           fluidPage(
-             fluidRow(
-               column(width = 12,
-                      ## This doesn't show up in the Rstudio preview window.
-                      withMathJax(includeHTML('aboutpage.html'))
-
+         ),
+                 
+         #### MAP/REALISATION TAB ####
+         tabPanel("Map Simulation",
+                  fluidPage(
+                    fluidRow(
+                      column(width = 12,
+                             
+                        helpText("Map showing possible realisation?")
+                             
+                      )
+                    )
+                  )
+         ),
+         
+         #### MODEL TAB ####
+         tabPanel("Model",
+                  fluidPage(
+                    fluidRow(
+                      column(width = 12,
+                             
+                         withMathJax(includeHTML('modelpage.html'))
+                             
+                      )
+                    )
+                  )
+         ), 
+         
+         #### ABOUT TAB ####
+         tabPanel("About",
+                  fluidPage(
+                    fluidRow(
+                      column(width = 12,
+                             ## The mathjax doesn't show up in the Rstudio preview window.
+                             withMathJax(includeHTML('aboutpage.html'))
+                             
+                      ) 
                     ) 
-               ) 
-             ) 
-        #####
-        ) 
+                  ) 
+         ) 
       ) 
     ) 
     ) 
-    ) 
+  ) 
 )
