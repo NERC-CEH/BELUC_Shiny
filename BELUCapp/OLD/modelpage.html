@@ -189,69 +189,26 @@ $(document).ready(function () {
 
 <div id="about-the-beluc-model" class="section level1">
 <h1>About the BELUC Model</h1>
+<p>Outline of the model</p>
 <div id="terminology" class="section level2">
 <h2>Terminology</h2>
 <p>In this Land Use Change (LUC) model, <em>Land Use</em> and <em>Land Cover</em> will by synonymous, and abbreviated to LU.</p>
 </div>
 <div id="data-sets" class="section level2">
 <h2>Data sets</h2>
-<p>The datasets that are used in the model are as follows:</p>
-<table>
-<thead>
-<tr class="header">
-<th>Acronym</th>
-<th>Name</th>
-<th>Reference</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>AC</td>
-<td>Agricultural Census</td>
-<td><a href="https://www.gov.scot/Topics/Statistics/Browse/Agricultural-Fisheries/PubFinalResultsuneCensus">Scottish Government (2017)</a></td>
-</tr>
-<tr class="even">
-<td>ALCM</td>
-<td>Agricultural Land Capability Map</td>
-<td>x</td>
-</tr>
-<tr class="odd">
-<td>Corine</td>
-<td>Corine satellite-based land cover information</td>
-<td><a href="https://www.eea.europa.eu/data-and-maps/data/clc-2012-raster">EEA (2016)</a></td>
-</tr>
-<tr class="even">
-<td>CS</td>
-<td>Countryside Survey</td>
-<td><a href="https://doi.org/10.1016/j.jenvman.2012.07.030">Norton <em>et al.</em> (2012)</a>; <a href="https://doi.org/10.5194/essd-9-445-2017">Wood <em>et al.</em> (2017)</a></td>
-</tr>
-<tr class="odd">
-<td>EAC</td>
-<td>EDINA Agricultural Census</td>
-<td><a href="http://agcensus.edina.ac.uk">EDINA</a></td>
-</tr>
-<tr class="even">
-<td>FC</td>
-<td>FC new planting</td>
-<td><a href="https://www.foresty.gov.uk/datadownload">Forestry Commission</a></td>
-</tr>
-<tr class="odd">
-<td>IACS</td>
-<td>Integrated Administration and Control System</td>
-<td><a href="https://doi.org/10.1016/j.envsci.2016.02.008">Tomlinson <em>et al.</em> (2018)</a></td>
-</tr>
-<tr class="even">
-<td>LCM</td>
-<td>CEH Land Cover Map</td>
-<td><a href="https://doi.org/10.5285/6c6c9203-7333-4d96-88ab-78925e7a4e73">Rowland <em>et al.</em> (2017)</a></td>
-</tr>
-<tr class="odd">
-<td>NFEW</td>
-<td>FC National Forest Estate and Woodlands</td>
-<td><a href="https://www.foresty.gov.uk/datadownload">Forestry Commission</a></td>
-</tr>
-</tbody>
-</table>
+<p>The datasets that are used in the model are as follows: <!---
+| Acronym | Name    | Reference   |
+|-|---|---|
+| AC      | Agricultural Census                           | [Scottish Government (2017)](https://www.gov.scot/Topics/Statistics/Browse/Agricultural-Fisheries/PubFinalResultsuneCensus) |
+| ALCM    | Agricultural Land Capability Map              | x |
+| Corine  | Corine satellite-based land cover information | [EEA (2016)](https://www.eea.europa.eu/data-and-maps/data/clc-2012-raster) |
+| CS      | Countryside Survey                            | [Norton *et al.* (2012)](https://doi.org/10.1016/j.jenvman.2012.07.030); [Wood *et al.* (2017)](https://doi.org/10.5194/essd-9-445-2017) |
+| EAC     | EDINA Agricultural Census                     | [EDINA](http://agcensus.edina.ac.uk) |
+| FC      | FC new planting                               | [Forestry Commission](https://www.foresty.gov.uk/datadownload) |
+| IACS    | Integrated Administration and Control System  | [Tomlinson *et al.* (2018)](https://doi.org/10.1016/j.envsci.2016.02.008) |
+| LCM     | CEH Land Cover Map                            | [Rowland *et al.* (2017)](https://doi.org/10.5285/6c6c9203-7333-4d96-88ab-78925e7a4e73) |
+| NFEW    | FC National Forest Estate and Woodlands       | [Forestry Commission](https://www.foresty.gov.uk/datadownload) |
+---></p>
 </div>
 </div>
 <div id="the-beluc-approach" class="section level1">
@@ -266,80 +223,32 @@ $(document).ready(function () {
 <p>Only the first step is done in a truly Bayesian way, i.e. a prior probability distribution for the parameters is specified, as is a data-likelihood function, and then the posterior distribution for the parameters is derived (by application of Bayes’ Theorem) as being proportional to prior and likelihood.</p>
 <div id="main-model-parameters-to-be-estimated" class="section level2">
 <h2>Main model parameters to be estimated</h2>
-<table>
-<colgroup>
-<col width="13%"></col>
-<col width="15%"></col>
-<col width="10%"></col>
-<col width="61%"></col>
-</colgroup>
-<thead>
-<tr class="header">
-<th>Parameter set</th>
-<th>Dimension</th>
-<th>Units of elements</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>A = {<span class="math inline">\(A_{ut}\)</span>}</td>
-<td>6 x 47</td>
-<td><span class="math inline">\(m^2\)</span></td>
-<td>Total area in Scotland of LU-type u in year t</td>
-</tr>
-<tr class="even">
-<td>B = {<span class="math inline">\(\beta_{ijt}\)</span>}</td>
-<td>6 x 6 x 46</td>
-<td><span class="math inline">\(m^2\)</span> per year</td>
-<td>Total LUC from LU=i in year t-1 to LU=j in year t</td>
-</tr>
-<tr class="odd">
-<td>U = {<span class="math inline">\(U_{xyt}\)</span>}</td>
-<td><span class="math inline">\(n_x \times n_y \times 47\)</span></td>
-<td>-</td>
-<td>LU-type in grid cell (x,y) in year t</td>
-</tr>
-</tbody>
-</table>
-<p>Here <span class="math inline">\(n_x\)</span> is the number of columns and <span class="math inline">\(n_y\)</span> is the number of rows in the grid covering Scotland (approximately 4000x4000).</p>
+<!---
+| Parameter set | Dimension | Units of elements | Meaning |
+|------------|--------------|---------|-----------------------------------------------------------|
+| A = A(u,t) | 6 x 47 | m^2^ | Total area in Scotland of LU-type u in year t |
+| B = b(i,j,t) | 6 x 6 x 46 | m^2^ per year | Total LUC from  LU=i in year t-1 to LU=j in year t |
+| U = U(x,y,t) | n(x) * n(y)  47$ | - | LU-type in grid cell (x,y) in year t |
+--->
+<p>Here n(x) is the number of columns and n(y) is the number of rows in the grid covering Scotland (approximately 4000x4000).</p>
 </div>
 <div id="details-of-step-1" class="section level2">
 <h2>Details of step 1</h2>
 <p>Step 1 starts out with data from CS and then uses data from AC, Corine, EAC, IACS, and NFEW.</p>
 <p>The prior for the LUC parameters is based on linear interpolation of LUC-observations in consecutive Countryside Surveys. All LUC parameters are a priori considered to be independent, so their joint prior probability distribution is simply the product of all 1380 marginal priors: Gaussian distributions with a shared standard deviation SD_LUC. The marginal priors are Gaussian distributions, and they all share the same standard deviation, derived using bootstrapping from the CS data (Scott <em>et al.</em>, 2008; Wood <em>et al.</em>, 2017).</p>
-<p>Three likelihood functions are specified which use data from AC, EAC, and {Corine, IACS, NFEW} respectively. The three likelihood functions are assumed to provide independent information and so are multiplied to arrive at one overall likelihood function <span class="math inline">\(L(\beta)\)</span>.</p>
-<p>The Bayesian calibration of the LUC parameters is carried out by means of MCMC, which generates a representative sample from the posterior distribution for the parameters. To make the sampling tractable, this is done separately for the different years. This allows for correlations between parameter estimates within individual years, but correlations between parameter estimates for different years are thereby ignored. The joint posterior distribution for all 1380 parameters is thus assumed to be the direct product of the 46 within-year posterior distributions.</p>
-<table>
-<thead>
-<tr class="header">
-<th>Parameter</th>
-<th>Symbol used</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>standard deviation for LUC-parameters</td>
-<td>SD_LUC</td>
-</tr>
-<tr class="even">
-<td>standard deviation for net LUC likelihood from AC data</td>
-<td>SD_NET</td>
-</tr>
-<tr class="odd">
-<td>st dev. for gross LUC likelihood from EAC data</td>
-<td>SD_GROSS</td>
-</tr>
-<tr class="even">
-<td>st dev. for LUC prediction error from Corine, IACS and NFEW data</td>
-<td>SD_PRED</td>
-</tr>
-</tbody>
-</table>
+<p>Three likelihood functions are specified which use data from AC, EAC, and (Corine, IACS, NFEW) respectively. The three likelihood functions are assumed to provide independent information and so are multiplied to arrive at one overall likelihood function L(b). One additional option included is to inversely weight the different likelihood functions by the number of parameters they are used to estimate, so lower dimensional likelihoods have a greater weighting. This can be selected to be applied or not on the main page.</p>
+<p>The Bayesian calibration of the LUC parameters is carried out by means of MCMC, which generates a representative sample from the posterior distribution for the parameters. To make the sampling tractable, this is done separately for the different years. This allows for correlations between parameter estimates within individual years, but correlations between parameter estimates for different years are thereby ignored. The joint posterior distribution for all 1380 parameters is thus assumed to be the direct product of the 46 within-year posterior distributions. <!---
+| Parameter | Symbol used |
+|-----------|-------------|
+| coefficient of variation (CV) for prior LUC-parameters | CV_prior |
+| CV for net LUC likelihood from AC data | CV_net |
+| CV for gross LUC likelihood from EAC data | CV_gross |
+| CV for LUC prediction error from Corine, IACS and NFEW data | CV_B_cin |
+---></p>
 </div>
 <div id="details-of-step-2" class="section level2">
 <h2>Details of step 2</h2>
-<p>Step 2 uses data from all the outlined data sources. The goal of this step is to allocate the annual LUC-areas (represented by the LUC parameters estimated in Step 1) to all the grid cells. Thereby, full 47-year long time series of LU are generated for each of the grid cells denoted <span class="math inline">\(U_{xyt}\)</span> in Table 1.</p>
+<p>Step 2 uses data from all the outlined data sources. The goal of this step is to allocate the annual LUC-areas (represented by the LUC parameters estimated in Step 1) to all the grid cells. Thereby, full 47-year long time series of LU are generated for each of the grid cells denoted U(x,y,t) in Table 1.</p>
 </div>
 </div>
 

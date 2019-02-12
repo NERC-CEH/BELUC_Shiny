@@ -6,7 +6,9 @@
 # summary statistics from the model outputs.
 #
 # TODO: add to Lancaster Shiny server
-# TODO: act on feedback
+# TODO: find CEH style for app (using leaflet?)
+# TODO: split model and project information into two markdown files. Needs
+# placeholder for figures?
 
 library(shiny)
 library(ggplot2)
@@ -17,10 +19,16 @@ library(htmltools)
 library(markdown)
 library(knitr)
 
-# options(show.error.messages = F)
-# options(warn=-1)
+### BEFORE COMPILING, KNIT aboutpage.Rmd AND modelpage.Rmd USING RSTUDIO ###
 
-
+# markdownToHTML("aboutpage.md", "./aboutpage.html",
+#                stylesheet = "markdown.css",
+#                extensions="tables",
+#                options = "mathjax")
+# markdownToHTML("modelpage.md", "./modelpage.html",
+#                stylesheet = "markdown.css",
+#                extensions = c("tables", "latex_math"),
+#                options = "mathjax")
 
 datasets_full <- c(
   "Agricultural Census",
@@ -64,73 +72,63 @@ shinyUI(
                 column(width = 4, # User choices and initial parameters 
                    wellPanel(
                      
-                     h3("Dataset choices"),
+                     h2("Dataset choices"),
                      helpText("Select the datasets you wish to include in this",
                               "evaluation of the model."),
                      checkboxGroupInput("dataset_checkbox",
                                         "Datasets included:",
                                         choiceNames = datasets_full,
                                         choiceValues = datasets_initials,
-                                        selected = datasets_initials,
+                                        selected = datasets_initials, 
                                         width="90%"),
                      
-                     h3("Parameter scaling choices"),
-                     
-                     uiOutput("LUC_s"), # This appear if applicable due to 
-                     uiOutput("NET_s"), # dataset choices
-                     uiOutput("GROSS_s"),
-                     uiOutput("PRED_s"),
+                     h2("Parameter scaling choices"),
 
-                     # sliderTextInput("LUC_slider",
-                     #                 "Scaling for CV_net:",
-                     #                 choices = c("0.1", "1.0", "10"),
-                     #                 selected = "1.0",
-                     #                 grid=T),
-                     # sliderTextInput("NET_slider",
-                     #                 "Scaling for CV_net:",
-                     #                 choices = c("0.01", "0.1", "1.0"),
-                     #                 selected = "0.1",
-                     #                 grid=T),
-                     # sliderTextInput("GROSS_slider",
-                     #                 "Scaling for CV_net:",
-                     #                 choices = c("0.02", "0.2", "2.0"),
-                     #                 selected = "0.2",
-                     #                 grid=T),
-                     # sliderTextInput("PRED_slider",
-                     #                 "Scaling for CV_net:",
-                     #                 choices = c("0.02", "0.2", "2.0"),
-                     #                 selected = "0.2",
-                     #                 grid=T),
-                     h3("Weighting Selection"),
-                     checkboxInput("weighted_check",
-                                   "Inverse Weighted Likelihood",
-                                   T),
+                     sliderTextInput("LUC_slider",
+                                     "Scaling for CV_net:",
+                                     choices = c("0.01", "0.1", "1.0"),
+                                     selected = "0.1",
+                                     grid=T),
+                     sliderTextInput("NET_slider",
+                                     "Scaling for CV_net:",
+                                     choices = c("0.01", "0.1", "1.0"),
+                                     selected = "0.1",
+                                     grid=T),
+                     sliderTextInput("GROSS_slider",
+                                     "Scaling for CV_net:",
+                                     choices = c("0.01", "0.1", "1.0"),
+                                     selected = "0.1",
+                                     grid=T),
+                     sliderTextInput("PRED_slider",
+                                     "Scaling for CV_net:",
+                                     choices = c("0.01", "0.1", "1.0"),
+                                     selected = "0.1",
+                                     grid=T),
                      
-                     h3("Model diagnostics:"),
-                     htmlOutput("scaling_factor")
+                     tableOutput("factorOAAT")
+                     
                    )),
                 
-                column(width = 8,
+                
+                column(width = 3,
+                       
+                       # Column containing resultant tables/graphs
+                       h3(paste("Summary of Land Use Change")),
+                       
+                       h4("Most frequent land use changes"),
+                       tableOutput("luc_freqA"),
+                       
+                       h4("Average proportion of land use types"),
+                       tableOutput("av_persistA")
+                       
+                ),
+                column(width = 5,
                        
                        # Column containing resultant tables/graphs
                        h3("Spatial variability over time"),
                        
-                       checkboxInput("show_bounds_check",
-                                     "Show 95% quantile bounds?",
-                                     T),
-                       
                        #tableOutput("spatial_varA")
-                       plotlyOutput("spatial_plot", height='100%'),
-                       
-                       
-                       # # Column containing resultant tables/graphs
-                       # h3(paste("Summary of Land Use Change")),
-                       
-                       h3("Most frequent land use changes"),
-                       tableOutput("luc_freqA"),
-                       
-                       h3("Average proportion of land use types"),
-                       tableOutput("av_persistA")
+                       plotlyOutput("spatial_plot")
                        
                 )
               )
@@ -155,22 +153,27 @@ shinyUI(
                   fluidPage(
                     fluidRow(
                       column(width = 12,
-                             includeHTML('modelpage3.html')
+                            helpText("a")
+                         #withMathJax(includeHTML('modelpage.html'))
+                             
                       )
                     )
                   )
-         ),
+         ), 
          
          #### ABOUT TAB ####
          tabPanel("About",
                   fluidPage(
                     fluidRow(
                       column(width = 12,
-                             includeHTML('aboutpage2.html')
-                      )
-                    )
-                  )
-         )
+                             ## The mathjax doesn't show up in the Rstudio preview window.             
+                             helpText("b")
+                            # withMathJax(includeHTML('aboutpage.html'))
+                             
+                      ) 
+                    ) 
+                  ) 
+         ) 
       ) 
     ) 
     ) 

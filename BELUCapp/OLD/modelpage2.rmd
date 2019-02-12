@@ -1,0 +1,43 @@
+# About the BELUC Model
+
+Outline of the model
+
+## Terminology
+
+In this Land Use Change (LUC) model, <em>Land Use</em> and <em>Land Cover</em> will by synonymous, and abbreviated to LU. 
+
+## Data sets
+
+The datasets that are used in the model are as follows:
+  
+# The BELUC approach
+  
+The model is spatio-temporal. It estimates land cover on a fine rectangular grid (100 x 100 m), with annual time steps. 
+
+In the paper, the approach is applied to the time period 1969-2016, 47 years long, so there are 46 opportunities for LUC in each grid cell. Six land cover types were  distinguished: forest (1), crop (2), grassland (3), rough grazing (4) , urban (5), other (6).
+
+The Bayesian calibration of the model proceeds in two steps:
+  
+1. Estimation of the non-spatial <em>LUC parameters</em> for each option for land use change (5 x 6 = 30) and each timepoint: a total of 1380 parameters.
+2. For each year, allocation of the estimated areas of LUC to different grid cells.
+
+Only the first step is done in a truly Bayesian way, i.e. a prior probability distribution for the parameters is specified, as is a data-likelihood function, and then the posterior distribution for the parameters is derived (by application of Bayes' Theorem) as being proportional to prior and likelihood.
+
+## Main model parameters to be estimated
+
+Here n(x) is the number of columns and n(y) is the number of rows in the grid covering Scotland (approximately 4000x4000).
+
+## Details of step 1
+
+Step 1 starts out with data from CS and then uses data from AC, Corine, EAC, IACS, and NFEW. 
+
+The prior for the LUC parameters is based on linear interpolation of LUC-observations in consecutive Countryside Surveys. All LUC parameters are a priori considered to be independent, so their joint prior probability distribution is simply the product of all 1380 marginal priors: Gaussian distributions with a shared standard deviation SD_LUC. The marginal priors are Gaussian distributions, and they all share the same standard deviation, derived using bootstrapping from the CS data (Scott <em>et al.</em>, 2008; Wood <em>et al.</em>, 2017).
+
+Three likelihood functions are specified which use data from AC, EAC, and (Corine, IACS, NFEW) respectively. The three likelihood functions are assumed to provide independent information and so are multiplied to arrive at one overall likelihood function L(b).
+One additional option included is to inversely weight the different likelihood functions by the number of parameters they are used to estimate, so lower dimensional likelihoods have a greater weighting. This can be selected to be applied or not on the main page.
+
+The Bayesian calibration of the LUC parameters is carried out by means of MCMC, which generates a representative sample from the posterior distribution for the parameters. To make the sampling tractable, this is done separately for the different years. This allows for correlations between parameter estimates within individual years, but correlations between parameter estimates for different years are thereby ignored. The joint posterior distribution for all 1380 parameters is thus assumed to be the direct product of the 46 within-year posterior distributions.
+
+## Details of step 2
+
+Step 2 uses data from all the outlined data sources. The goal of this step is to allocate the annual LUC-areas (represented by the LUC parameters estimated in Step 1) to all the grid cells. Thereby, full 47-year long time series of LU are generated for each of the grid cells denoted U(x,y,t) in Table 1.
