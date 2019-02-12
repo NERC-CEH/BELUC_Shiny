@@ -120,6 +120,7 @@ shinyUI(
                                      T),
                        
                        #tableOutput("spatial_varA")
+                       helpText("Single-click on lines in the legend to remove/restore that land cover. Double-click to remove/restore all OTHER land cover. Drag on axes to pan/zoom. Hover over plot to show plotly tools (topleft)."),
                        plotlyOutput("spatial_plot", height='100%'),
                        
                        
