@@ -8,14 +8,16 @@
 # TODO: add to Lancaster Shiny server
 # TODO: act on feedback
 
-library(shiny)
-library(ggplot2)
-library(shinyWidgets)
-library(plotly)
-library(htmltools)
+library('shiny')
+library('ggplot2')
+library('shinyWidgets')
+library('plotly')
+library('htmltools')
+library('markdown')
+library('knitr')
+library('reshape')
+library('leaflet')
 
-library(markdown)
-library(knitr)
 
 # options(show.error.messages = F)
 # options(warn=-1)
@@ -120,8 +122,13 @@ shinyUI(
                                      T),
                        
                        #tableOutput("spatial_varA")
-                       helpText("Single-click on lines in the legend to remove/restore that land cover. Double-click to remove/restore all OTHER land cover. Drag on axes to pan/zoom. Hover over plot to show plotly tools (topleft)."),
-                       plotlyOutput("spatial_plot", height='100%'),
+                       helpText("Single-click on lines in the legend to remove/restore that land cover. Double-click to remove/restore all OTHER land cover. Drag on axes to pan/zoom. Hover over plot to show plotly tools (topright)."),
+                       
+                       div(
+                         plotlyOutput("spatial_plot", height='100%'),
+                         style = "border: solid black 1px"
+                       ),
+                       
                        
                        
                        # # Column containing resultant tables/graphs

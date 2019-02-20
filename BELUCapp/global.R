@@ -7,7 +7,7 @@
 # summary statistics from the model outputs.
 
 # global variables for both server and ui, called once when app started on server.
-library(shiny)
+library('shiny')
 
 #### Standard Deviations for prior distributions ####
 
