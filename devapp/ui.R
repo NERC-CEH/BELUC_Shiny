@@ -6,43 +6,10 @@
 # summary statistics from the model outputs.
 #
 # TODO: add to Lancaster Shiny server
-# TODO: find CEH style for app (using leaflet?)
-# TODO: split model and project information into two markdown files. Needs
-# placeholder for figures?
+# TODO: act on feedback
 
-library(shiny)
-library(ggplot2)
-library(shinyWidgets)
-library(plotly)
-library(htmltools)
-
-library(markdown)
-library(knitr)
-
-### BEFORE COMPILING, KNIT aboutpage.Rmd AND modelpage.Rmd USING RSTUDIO ###
-
-# markdownToHTML("aboutpage.md", "./aboutpage.html",
-#                stylesheet = "markdown.css",
-#                extensions="tables",
-#                options = "mathjax")
-# markdownToHTML("modelpage.md", "./modelpage.html",
-#                stylesheet = "markdown.css",
-#                extensions = c("tables", "latex_math"),
-#                options = "mathjax")
-
-datasets_full <- c(
-  "Agricultural Census",
-  "Agricultural Land Capability Map",
-  "Corine Land Cover Map",
-  "Countryside Survey",
-  "EDINA Agricultural Census",
-  "Forestry Commission New Planting",
-  "Integrated Administration and Control System",
-  "CEH Land Cover Map",
-  "Forestry Commission National Forest Estates and Woodlands")
-
-datasets_initials <- c("AC", "ALCM", "Corine", "CS", "EAC", "FC", "IACS",
-                       "LCM", "NFEW")
+# options(show.error.messages = F)
+# options(warn=-1)
 
 shinyUI(
   #####
@@ -52,7 +19,7 @@ shinyUI(
              img(src = "CEH_RGB_PMS.png",width = "290",height = "70",
                  style="margin:10px 0px")),
       
-      column(width=5, h2("Bayesian Estimation of Land Use Change")),
+      column(width=5, h2("DEV VERSION")),
       
       column(width = 4,
              img(src = "UK_SCAPE_Logo_Positive.png",width = "368",height = "70",
@@ -61,119 +28,95 @@ shinyUI(
     
     #titlePanel("Bayesian Estimation of Land Use Change"),
     
-    fluidRow(column(
-      width = 12,
-      navbarPage("BELUC",
-                 
-         #### PARAMETERS AND SUMMARY TAB ####
-         tabPanel("Plot",
-            fluidPage(
-              fluidRow(
-                column(width = 4, # User choices and initial parameters 
-                   wellPanel(
-                     
-                     h2("Dataset choices"),
-                     helpText("Select the datasets you wish to include in this",
-                              "evaluation of the model."),
-                     checkboxGroupInput("dataset_checkbox",
-                                        "Datasets included:",
-                                        choiceNames = datasets_full,
-                                        choiceValues = datasets_initials,
-                                        selected = datasets_initials, 
-                                        width="90%"),
-                     
-                     h2("Parameter scaling choices"),
+    fluidRow(
+      column(width=4,
+             wellPanel(
+               
+               h3("Dataset choices"),
+               helpText("Select the datasets you wish to include in this. Currently not functionl; parameters associated to unselected datasets are fixed to their default value.",
+                        "evaluation of the model."),
+               checkboxGroupInput("dataset_checkbox",
+                                  "Datasets included:",
+                                  choiceNames = datasets_full,
+                                  choiceValues = datasets_initials,
+                                  selected = datasets_initials,
+                                  width="90%"),
+               
+               h3("Parameter scaling choices"),
+               
+               uiOutput("LUC_s"), # This appear if applicable due to 
+               uiOutput("NET_s"), # dataset choices
+               uiOutput("GROSS_s"),
+               uiOutput("PRED_s"),
 
-                     sliderTextInput("LUC_slider",
-                                     "Scaling for CV_net:",
-                                     choices = c("0.01", "0.1", "1.0"),
-                                     selected = "0.1",
-                                     grid=T),
-                     sliderTextInput("NET_slider",
-                                     "Scaling for CV_net:",
-                                     choices = c("0.01", "0.1", "1.0"),
-                                     selected = "0.1",
-                                     grid=T),
-                     sliderTextInput("GROSS_slider",
-                                     "Scaling for CV_net:",
-                                     choices = c("0.01", "0.1", "1.0"),
-                                     selected = "0.1",
-                                     grid=T),
-                     sliderTextInput("PRED_slider",
-                                     "Scaling for CV_net:",
-                                     choices = c("0.01", "0.1", "1.0"),
-                                     selected = "0.1",
-                                     grid=T),
-                     
-                     tableOutput("factorOAAT")
-                     
-                   )),
-                
-                
-                column(width = 3,
-                       
-                       # Column containing resultant tables/graphs
-                       h3(paste("Summary of Land Use Change")),
-                       
-                       h4("Most frequent land use changes"),
-                       tableOutput("luc_freqA"),
-                       
-                       h4("Average proportion of land use types"),
-                       tableOutput("av_persistA")
-                       
-                ),
-                column(width = 5,
-                       
-                       # Column containing resultant tables/graphs
-                       h3("Spatial variability over time"),
-                       
-                       #tableOutput("spatial_varA")
-                       plotlyOutput("spatial_plot")
-                       
-                )
-              )
-            )
-         ),
+               h3("Weighting Selection"),
+               checkboxInput("weighted_check",
+                             "Inverse Weighted Likelihood",
+                             T),
+               
+               h3("Model diagnostics:"),
+               htmlOutput("scaling_factor")
+             )
+             ),
+      column(
+        width = 8,
+        navbarPage("DEV",
                  
-         #### MAP/REALISATION TAB ####
-         tabPanel("Map Simulation",
-                  fluidPage(
-                    fluidRow(
-                      column(width = 12,
-                             
-                        helpText("Map showing possible realisation?")
-                             
-                      )
-                    )
-                  )
-         ),
-         
-         #### MODEL TAB ####
-         tabPanel("Model",
-                  fluidPage(
-                    fluidRow(
-                      column(width = 12,
-                            helpText("a")
-                         #withMathJax(includeHTML('modelpage.html'))
-                             
-                      )
-                    )
-                  )
-         ), 
-         
-         #### ABOUT TAB ####
-         tabPanel("About",
-                  fluidPage(
-                    fluidRow(
-                      column(width = 12,
-                             ## The mathjax doesn't show up in the Rstudio preview window.             
-                             helpText("b")
-                            # withMathJax(includeHTML('aboutpage.html'))
-                             
-                      ) 
-                    ) 
-                  ) 
-         ) 
+       #### PARAMETERS AND SUMMARY TAB ####
+       tabPanel("Plot",
+        fluidPage(
+          fluidRow(
+            column(width = 12,
+                       
+             # Column containing resultant tables/graphs
+             h3("Spatial variability over time"),
+             h4("Growth (shown as positive) and Losses (shown as negative)"),
+             checkboxInput("show_bounds_check",
+                           "Show 95% quantile bounds?",
+                           T),
+             
+             #tableOutput("spatial_varA")
+             helpText("Drag box and double-click to zoom. Double-click without selection to reset to automatic zoom. Use tickboxes below to show and hide landcover types. Shaded regions are 95% credible intervals."),
+            
+             plotOutput("spatial_plot", height=500,
+                        dblclick = "plot1_dblclick",
+                        brush = brushOpts(
+                          id = "plot1_brush",
+                          resetOnNew = TRUE)),
+             
+             checkboxGroupInput("linechoices",
+                      "Select Land Cover types to show:",
+                      choiceNames = list(
+                        tags$span(lc[2], style = "background-color: #b3e2cd;"),
+                        tags$span(lc[1], style = "background-color: #fdcdac;"), 
+                        tags$span(lc[3], style = "background-color: #cbd5e8;"),
+                        tags$span(lc[6], style = "background-color: #f4cae4;"),
+                        tags$span(lc[4], style = "background-color: #e6f5c9;"), 
+                        tags$span(lc[5], style = "background-color: #fff2ae;")
+                      ),
+                      choiceValues = lc[c(2,1,3,6,4,5)],
+                      inline=T,
+                      selected=lc[c(2,1,3,6,4)]
+              ),
+             
+             h3("Most frequent land use changes"),
+             tableOutput("luc_freqA"),
+             
+             h3("Average proportion of land use types"),
+             tableOutput("av_persistA")
+             
+             
+             
+             
+          )))),
+       
+       #### EXTRA MATRICES TAB (BETA, A(t)) ####
+       tabPanel("Matrices",
+                fluidPage(
+                  fluidRow(
+                    column(width = 12,
+                           plotOutput("beta_visual")
+                    ))))
       ) 
     ) 
     ) 

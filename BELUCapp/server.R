@@ -15,74 +15,9 @@ library('leaflet')
 library('markdown')
 library('knitr')
 library('plotly')
+library('RColorBrewer')
 options(show.error.messages = F)
 options(warn=-1)
-
-#### COMPUTED ONCE ####
-sb_prior <- 4
-sobs_prior <- 6
-sl_prior <- 0.3
-sbobs_prior <- 2.2
-
-names <- c(
-  "Year-to-year land use change",
-  "Observational error in AC",
-  "Gross Losses/Gains observational error",
-  "Transition matrix observation error")
-
-# sd_table <- data.frame(
-#   "Prior_standard_deviations" = names,
-#   "Value"         = c(sb_prior, sobs_prior, sl_prior, sbobs_prior),
-#   row.names       = c("sb_prior", "sobs_prior", "sl_prior", "sbobs_prior"),
-#   stringsAsFactors=F)
-
-# lc <- c("forest", "crop", "grass", "rough", "urban", "other")
-# 
-# cols <- c('rgba(228,26,28,1)',
-#           'rgba(55,126,184,1)',
-#           'rgba(77,175,74,1)',
-#           'rgba(152,78,163,1)',
-#           'rgba(255,127,0,1)',
-#           'rgba(189,189,189,1)')
-# 
-# colsfill <- c('rgba(228,26,28,0.5)',
-#               'rgba(55,126,184,0.5)',
-#               'rgba(77,175,74,0.5)',
-#               'rgba(152,78,163,0.5)',
-#               'rgba(255,127,0,0.5)',
-#               'rgba(189,189,189,0.5)')
-# 
-# 
-# #### dummy tables for layout ####
-# luc_freq <- data.frame(
-#   "LUC_from" =c("forest", "forest", "crop", "grassland", "other"),
-#   "LUC_to"   =c("urban", "crop", "grassland", "crop", "urban"),
-#   "frequency"=c(0.25, 0.1, 0.04, 0.03, 0.025))
-# 
-# av_persist <- data.frame("Land_Use" = c("forest", "grassland", "crop", 
-#                                         "urban", "grazing", "other"),
-#                          "Av_Persistance" = c(0.3, 0.25, 0.37, 0.05, 0.1, 0.03))
-# 
-# 
-# spatial_var <- data.frame("Year"=1969:2015,
-#                           "Forest"=round(runif(47,0,8),2),
-#                           "Improved_Grassland"=round(runif(47,0,8),2),
-#                           "Crop"=round(runif(47,0,8),2),
-#                           "Urban"=round(runif(47,0,8),2),
-#                           "Rough_Grazing"=round(runif(47,0,8),2),
-#                           "Other"=round(runif(47,0,8),2))
-# 
-# # spatial_melt <- melt.data.frame(spatial_var,
-# #                                 id.var="Year",
-# #                                 variable_name="Land_Use")
-# # colnames(spatial_melt)[3] <- "Spatial_Variability"
-# 
-# load("../../SA/df_SA_notWeighted_2019-02-04.RData")
-# load("../../SA/df_SA_weighted_2019-02-04.RData")
-# df_SA <- rbind(df_SA_notWeighted, df_SA_weighted)
-
-
-
 
 shinyServer(function(input, output, session) {
   
@@ -135,8 +70,6 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  #### OUTPUTS #### 
-  
   #### RESULTS ####
   output$luc_freqA <- renderTable(
     head(luc_freq[order(luc_freq$frequency, decreasing=T),],10), 
@@ -151,121 +84,66 @@ shinyServer(function(input, output, session) {
     width='90%',
     striped=T, bordered=T, align='c', rownames=F)
 
-  output$spatial_plot <- renderPlotly({
-
-    # p <- ggplot(df_ts(), aes(year)) +
-    #   scale_colour_brewer(palette="Dark2") +
-    #   theme(legend.position="bottom") +
-    #   ylab("Year-on-year % growth") +
-    #   scale_x_continuous(breaks = seq(1968,2020,by=4)) +
-    #   geom_ribbon(aes(ymin=m_G.rel_q025_BC, ymax=m_G.rel_q975_BC,
-    #                   fill=land_cover), alpha=0.5) +
-    #   scale_fill_brewer(palette="Pastel2") +
-    #   theme(legend.position="bottom") +
-    #   geom_path(aes(y=m_G.rel_map_BC, col=land_cover), size=1)
-    # p
-    # 
+  output$spatial_plot <- renderPlot({
     
-    p1 <- plot_ly(df_ts(), x = df_ts()$year[df_ts()$land_cover==lc[1]])
-    
-    p2 <- plot_ly(df_ts(), x = df_ts()$year[df_ts()$land_cover==lc[1]])
-
-    
-    #layout(yaxis=list(range=c(0,40)))
-    #show_bounds <- input$show_bounds_check
-    for(j in 1:6){
-      # Add MAP traces
-      p1 <- add_trace(p1, x = df_ts()$year[df_ts()$land_cover==lc[j]],
-                     y = df_ts()$m_G.rel_map_BC[df_ts()$land_cover==lc[j]],
-                     type='scatter',
-                     mode='lines',
-                     line=list(color=cols[j], width=2),
-                     name=lc[j],
-                     legendgroup=lc[j],
-                     showlegend=T
-                     )
-      p2 <- add_trace(p2, x = df_ts()$year[df_ts()$land_cover==lc[j]],
-                      y = df_ts()$m_L.rel_map_BC[df_ts()$land_cover==lc[j]],
-                      type='scatter',
-                      mode='lines',
-                      line=list(color=cols[j], width=2),
-                      name=lc[j],
-                      legendgroup=lc[j],
-                      yaxis='y2',
-                      showlegend=F)
-      
-      if(input$show_bounds_check){
-        # Add upper and lower bounds
-        #browser()
-        p1 <- add_trace(p1, x = df_ts()$year[df_ts()$land_cover==lc[j]],
-                        y = df_ts()$m_G.rel_q975_BC[df_ts()$land_cover==lc[j]],
-                       type='scatter',
-                       mode='lines',
-                       line=list(color=cols[j], width=0),
-                       name=paste("97.5%", lc[j]),
-                       legendgroup=lc[j],
-                       showlegend=F)
-
-        p1 <- add_trace(p1, x = df_ts()$year[df_ts()$land_cover==lc[j]],
-                        y= df_ts()$m_G.rel_q025_BC[df_ts()$land_cover==lc[j]],
-                       type='scatter',
-                       mode='lines',
-                       line=list(color=cols[j], width=0),
-                       fillcolor=colsfill[j],
-                       fill = 'tonexty',
-                       name=paste("2.5%", lc[j]),
-                       legendgroup=lc[j],
-                       showlegend=F)
-        
-        p2 <- add_trace(p2, x = df_ts()$year[df_ts()$land_cover==lc[j]],
-                        y = df_ts()$m_L.rel_q975_BC[df_ts()$land_cover==lc[j]],
-                        type='scatter',
-                        mode='lines',
-                        line=list(color=cols[j], width=0),
-                        name=paste("97.5%", lc[j]),
-                        legendgroup=lc[j],
-                        yaxis='y2',
-                        showlegend=F)
-
-        p2 <- add_trace(p2, x = df_ts()$year[df_ts()$land_cover==lc[j]],
-                        y= df_ts()$m_L.rel_q025_BC[df_ts()$land_cover==lc[j]],
-                        type='scatter',
-                        mode='lines',
-                        line=list(color=cols[j], width=0),
-                        fillcolor=colsfill[j],
-                        fill = 'tonexty',
-                        name=paste("2.5%", lc[j]),
-                        legendgroup=lc[j],
-                        yaxis='y2',
-                        showlegend=F)
-      }
+    p <- ggplot(df_ts(), aes(year)) +
+      ylab("Year-on-year % growth and loss") +
+      scale_x_continuous(breaks = seq(1968,2020,by=4))
+    if(input$show_bounds_check){
+      p <- p + geom_ribbon(aes(ymin=m_G.rel_q025_BC,
+                               ymax=m_G.rel_q975_BC,
+                               fill=land_cover),
+                           alpha=0.5) +
+        geom_ribbon(aes(ymin=-1*m_L.rel_q975_BC,
+                        ymax=-1*m_L.rel_q025_BC,
+                        fill=land_cover),
+                    alpha=0.5) + 
+        scale_fill_manual(values=pastel2set)
     }
-
-    p1 <- layout(p1, yaxis=list(title="% growth",
-                                scaleanchor='y2', constraintoward='bottom'),
-                 xaxis=list(domain=c(0, 1)))
-    p2 <- layout(p2, yaxis=list(title="% loss", autorange='reversed',
-                                scaleanchor='y', constraintoward='top'),
-                 xaxis=list(domain=c(0, 1)))
-    p <- subplot(p1, p2, nrows=2,
-                 shareX=TRUE, titleX=TRUE,
-                 shareY=FALSE, titleY=TRUE,
-                 margin=0.02)
-    p <- layout(p, xaxis = list(domain=c(0,1)), legend=list(orientation='h'))
-                
+    p <- p +
+      geom_path(aes(y=m_G.rel_map_BC, col=land_cover), size=1) + 
+      geom_path(aes(y=-1*m_L.rel_map_BC, col=land_cover), size=1) +
+      scale_colour_manual(values=dark2set) +
+      coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = FALSE) + 
+      theme(legend.position="none")
+    p
+    
   })
   
   output$scaling_factor <- renderUI({
     
     s1 <- paste("Number of MCMC iterations = ", mcmc_it())
-    s2 <- paste("Model run started in year ", y_start() + 1967)
+    s2 <- paste("Max", maxdf())
+    s3 <- paste("Started in ", y_start()+1967)
     
-    HTML(paste(s1, s2, sep='<br/>'))
+    HTML(paste(s1, s2, s3, sep='<br/>'))
     #print(getwd())
     #names(df_table())
-    })
+  })
+  
+  output$beta_visual <- renderPlot({
+    corrplot(beta_fake, method='circle', type='full', 
+             col=colorRampPalette(c("red", "white", "blue"))(200),
+             is.corr=FALSE)
+  })
   
   #### REACTIVE OBJECTS ####
+  
+  ranges <- reactiveValues(x = c(2004, 2015),
+                           y = c(-45,45))  # default values for initial view.
+  
+  observeEvent(input$plot1_dblclick, {
+    ##Drag and double-click to zoom. Double-click to reset.
+    brush <- input$plot1_brush
+    if (!is.null(brush)) {
+      ranges$x <- c(brush$xmin, brush$xmax)
+      ranges$y <- c(brush$ymin, brush$ymax)
+      
+    } else {
+      ranges$y <- c(-maxdf(), maxdf())
+      ranges$x <- c(y_start()+1967, 2015)
+    }
+  })
   
   df_table <- reactive({
     if(!is.null(input$LUC_slider)){
@@ -295,9 +173,12 @@ shinyServer(function(input, output, session) {
     })
     dx <- d %>%
       do.call(rbind, .) %>%
-      cast(., year + land_cover ~ quant)
+      cast(., year + land_cover ~ quant) %>%
+      filter(., land_cover %in% input$linechoices)
     dx
   })
+  
+  maxdf <- reactive({ max(df_ts()[3:8])})
   
   slider_allow1 <- reactive({ "CS" %in% input$dataset_checkbox })
   slider_allow2 <- reactive({ "AC" %in% input$dataset_checkbox })

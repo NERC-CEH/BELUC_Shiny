@@ -5,83 +5,71 @@
 # app presents results of BELUC under different parameter choices and shows key
 # summary statistics from the model outputs.
 
-library(shiny)
-library(reshape)
-library(ggplot2)
-library(shinyWidgets)
-library(shinythemes)
-library(htmltools)
-library(leaflet)
-library(markdown)
-library(knitr)
-library(plotly)
-
-#### COMPUTED ONCE ####
-sb_prior <- 4
-sobs_prior <- 6
-sl_prior <- 0.3
-sbobs_prior <- 2.2
-
-names <- c(
-  "Year-to-year land use change",
-  "Observational error in AC",
-  "Gross Losses/Gains observational error",
-  "Transition matrix observation error")
-
-sd_table <- data.frame(
-  "Prior_standard_deviations" = names,
-  "Value"         = c(sb_prior, sobs_prior, sl_prior, sbobs_prior),
-  row.names       = c("sb_prior", "sobs_prior", "sl_prior", "sbobs_prior"),
-  stringsAsFactors=F)
-
-#### dummy tables for layout ####
-luc_freq <- data.frame(
-  "LUC_from" =c("forest", "forest", "crop", "grassland", "other"),
-  "LUC_to"   =c("urban", "crop", "grassland", "crop", "urban"),
-  "frequency"=c(0.25, 0.1, 0.04, 0.03, 0.025))
-
-av_persist <- data.frame("Land_Use" = c("forest", "grassland", "crop", 
-                                        "urban", "grazing", "other"),
-                         "Av_Persistance" = c(0.3, 0.25, 0.37, 0.05, 0.1, 0.03))
-
-
-spatial_var <- data.frame("Year"=1969:2015,
-                          "Forest"=round(runif(47,0,8),2),
-                          "Grassland"=round(runif(47,0,8),2),
-                          "Crop"=round(runif(47,0,8),2),
-                          "Urban"=round(runif(47,0,8),2),
-                          "Grazing"=round(runif(47,0,8),2),
-                          "Other"=round(runif(47,0,8),2))
-
-spatial_melt <- melt.data.frame(spatial_var, id.var="Year", variable_name="Land_Use")
-colnames(spatial_melt)[3] <- "Spatial_Variability"
+library('shiny')
+library('reshape')
+library('ggplot2')
+library('shinyWidgets')
+library('shinythemes')
+library('htmltools')
+library('leaflet')
+library('markdown')
+library('knitr')
+library('plotly')
+library('corrplot')
+library('RColorBrewer')
+# options(show.error.messages = F)
+# options(warn=-1)
 
 shinyServer(function(input, output, session) {
   
   #### UI COMPONENTS ####
   
-  #### OUTPUTS #### 
-  
-  output$factorOAAT <- renderTable({
-    # OAAT: one at a time, not currently true.
-    # Shows chosen parameter values for prior SD.
-    # takes input in (1,2,3), converts to (0.1, 1, 10)
-    
-    ins <- c(input$LUC_slider,
-             input$NET_slider,
-             input$GROSS_slider,
-             input$PRED_slider)
-    slots <- 1:4
-    ins <- ins[slots]
-    std <- sd_table[slots,]
-    for(y in 1:length(slots)){
-      scale <- as.numeric(ins[y])
-      std[y, 2] <- as.numeric(sd_table[y, 2])*scale  # scales
+  output$LUC_s <- renderUI({
+    if(slider_allow1()){
+      # selectInput("LUC_slider",
+      #             "Scaling for SD_LUC", choices=list(0.1, 1, 10), selected=1)
+      sliderTextInput("LUC_slider",
+                      "Scaling for CV_prior:",
+                      choices = c("0.1", "1", "10"),
+                      selected = "1",
+                      grid=T)
     }
-    std
-    
-  }, width='100%', striped=T, bordered=T, align='c', rownames=F)
+  })
   
+  output$NET_s <- renderUI({
+    if(slider_allow2()){
+      # selectInput("NET_slider", 
+      #             "Scaling for SD_NET", choices=list(0.1, 1, 10), selected=1)
+      sliderTextInput("NET_slider",
+                      "Scaling for CV_net:",
+                      choices = c("0.01", "0.1", "1.0"),
+                      selected = "0.1",
+                      grid=T)
+    } 
+  })
+  
+  output$GROSS_s <- renderUI({
+    if(slider_allow3()){
+      # selectInput("GROSS_slider",
+      #             "Scaling for SD_GROSS", choices=list(0.1, 1, 10), selected=1)
+      sliderTextInput("GROSS_slider",
+                      "Scaling for CV_gross:",
+                      choices = c("0.02", "0.2", "2.0"),
+                      selected = "0.2",
+                      grid=T)
+    }
+  })
+  output$PRED_s <- renderUI({
+    if(slider_allow4()){
+      # selectInput("PRED_slider",
+      #             "Scaling for SD_PRED", choices=list(0.1, 1, 10), selected=1)
+      sliderTextInput("PRED_slider",
+                      "Scaling for CV_B_cin:",
+                      choices = c("0.02", "0.2", "2.0"),
+                      selected = "0.2",
+                      grid=T)
+    }
+  })
   
   #### RESULTS ####
   output$luc_freqA <- renderTable(
@@ -93,24 +81,116 @@ shinyServer(function(input, output, session) {
                                     width='100%', digits=3,
                                     striped=T, bordered=T, align='c', rownames=F)
   
-  # output$spatial_varA <- renderTable(spatial_var, 
-  #   width='90%',
-  #   striped=T, bordered=T, align='c', rownames=F)
+  output$spatial_varA <- renderTable(spatial_var,
+                                     width='90%',
+                                     striped=T, bordered=T, align='c', rownames=F)
   
-  output$spatial_plot <- renderPlotly({
-    #plot_ly(spatial_melt, x=~Year, y = ~Spatial_Variability)
-    #key <- unique(spatial_melt$Land_Use)
-    p <- ggplot(spatial_melt, aes(Year, Spatial_Variability)) +
-      geom_path(aes(col=Land_Use)) +
-      scale_colour_brewer(palette="Dark2") +
-      theme(legend.position="bottom") +
-      ylab("Average number of Same-type neighbours")
-    #p
-    ggplotly(p)
+  output$spatial_plot <- renderPlot({
+    
+    p <- ggplot(df_ts(), aes(year)) +
+      ylab("Year-on-year % growth and loss") +
+      scale_x_continuous(breaks = seq(1968,2020,by=4))
+    if(input$show_bounds_check){
+      p <- p + geom_ribbon(aes(ymin=m_G.rel_q025_BC,
+                               ymax=m_G.rel_q975_BC,
+                               fill=land_cover),
+                           alpha=0.5) +
+               geom_ribbon(aes(ymin=-1*m_L.rel_q975_BC,
+                               ymax=-1*m_L.rel_q025_BC,
+                               fill=land_cover),
+                           alpha=0.5) + 
+               scale_fill_manual(values=pastel2set)
+    }
+    p <- p +
+      geom_path(aes(y=m_G.rel_map_BC, col=land_cover), size=1) + 
+      geom_path(aes(y=-1*m_L.rel_map_BC, col=land_cover), size=1) +
+      scale_colour_manual(values=dark2set) +
+      coord_cartesian(xlim = ranges$x, ylim = ranges$y, expand = FALSE) + 
+      theme(legend.position="none")
+    p
+    
   })
   
-  output$scaling_factor <- renderPrint(slider_allow4())
+  output$scaling_factor <- renderUI({
+    
+    s1 <- paste("Number of MCMC iterations = ", mcmc_it())
+    s2 <- paste("Max", maxdf())
+    s3 <- paste("Started in ", y_start()+1967)
+    
+    HTML(paste(s1, s2, s3, sep='<br/>'))
+    #print(getwd())
+    #names(df_table())
+  })
+  
+  output$beta_visual <- renderPlot({
+    corrplot(beta_fake, method='circle', type='full', 
+             col=colorRampPalette(c("red", "white", "blue"))(200),
+             is.corr=FALSE)
+  })
   
   #### REACTIVE OBJECTS ####
+  
+  ranges <- reactiveValues(x = c(2004, 2015),
+                           y = c(-45,45))
+  
+  observeEvent(input$plot1_dblclick, {
+    brush <- input$plot1_brush
+    if (!is.null(brush)) {
+      ranges$x <- c(brush$xmin, brush$xmax)
+      ranges$y <- c(brush$ymin, brush$ymax)
+      
+    } else {
+      ranges$y <- c(-maxdf(), maxdf())
+      ranges$x <- c(y_start()+1967, 2015)
+    }
+  })
+  
+  # observeEvent(df_ts(),{
+  #              ranges$y <- c(-maxdf(), maxdf())
+  #              ranges$x <- c(y_start()+1967, 2015)
+  #              })
+  
+  df_table <- reactive({
+    if(!is.null(input$LUC_slider)){
+      df_SA %>% filter(
+        CV_prior == as.numeric(input$LUC_slider),
+        CV_net == as.numeric(input$NET_slider),
+        CV_gross == as.numeric(input$GROSS_slider),
+        CV_B_cin == as.numeric(input$PRED_slider),
+        llik_weighted == input$weighted_check)
+    }else{
+      df_SA
+    }
+  })
+  
+  maxdf <- reactive({ max(df_ts()[3:8])})
+  
+  mcmc_it <- reactive({
+    df_table()$n_iter[1]
+  })
+  
+  y_start <- reactive(df_table()$backAsFarAs[1])
+  
+  df_ts <- reactive({
+    d <- lapply(8:13, function(i){
+      z <- melt(df_table()[1,i][[1]],
+                varnames=c("year", "land_cover"))
+      if (z$land_cover[1] %in% 1:6) z$land_cover <- lc[z$land_cover]
+      z$quant <- colnames(df_table()[i])
+      z
+    })
+    #browser()
+    dx <- d %>%
+      do.call(rbind, .) %>%
+      cast(., year + land_cover ~ quant) %>%
+      filter(., land_cover %in% input$linechoices)
+    dx
+  })
+  
+  slider_allow1 <- reactive({ "CS" %in% input$dataset_checkbox })
+  slider_allow2 <- reactive({ "AC" %in% input$dataset_checkbox })
+  slider_allow3 <- reactive({  "EAC" %in% input$dataset_checkbox })
+  slider_allow4 <- 
+    reactive({ all(c("Corine","IACS","NFEW") %in% input$dataset_checkbox) })
   
 })

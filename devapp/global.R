@@ -26,9 +26,12 @@ library('reshape')
 library('leaflet')
 library('shinythemes')
 library('RColorBrewer')
+#### Standard Deviations for prior distributions ####
 
-
-#### labels and formatting ####
+sb_prior <- 4
+sobs_prior <- 6
+sl_prior <- 0.3
+sbobs_prior <- 2.2
 
 names <- c(
   "Year-to-year land use change",
@@ -36,21 +39,8 @@ names <- c(
   "Gross Losses/Gains observational error",
   "Transition matrix observation error")
 
-datasets_full <- c(
-  "Agricultural Census",
-  "Agricultural Land Capability Map",
-  "Corine Land Cover Map",
-  "Countryside Survey",
-  "EDINA Agricultural Census",
-  "Forestry Commission New Planting",
-  "Integrated Administration and Control System",
-  "CEH Land Cover Map",
-  "Forestry Commission National Forest Estates and Woodlands")
-
-datasets_initials <- c("AC", "ALCM", "Corine", "CS", "EAC", "FC", "IACS",
-                       "LCM", "NFEW")
-
 lc <- c("forest", "crop", "grass", "rough", "urban", "other")
+#lc <- sort(lc)
 
 # cols <- c('rgba(228,26,28,1)',
 #           'rgba(55,126,184,1)',
@@ -69,14 +59,22 @@ lc <- c("forest", "crop", "grass", "rough", "urban", "other")
 dark2set <- setNames(brewer.pal(6,"Dark2"), sort(lc))
 pastel2set <- setNames(brewer.pal(6,"Pastel2"), sort(lc))
 
+datasets_full <- c(
+  "Agricultural Census",
+  "Agricultural Land Capability Map",
+  "Corine Land Cover Map",
+  "Countryside Survey",
+  "EDINA Agricultural Census",
+  "Forestry Commission New Planting",
+  "Integrated Administration and Control System",
+  "CEH Land Cover Map",
+  "Forestry Commission National Forest Estates and Woodlands")
+
+datasets_initials <- c("AC", "ALCM", "Corine", "CS", "EAC", "FC", "IACS",
+                       "LCM", "NFEW")
+
 
 #### dummy tables for layout ####
-sb_prior <- 4
-sobs_prior <- 6
-sl_prior <- 0.3
-sbobs_prior <- 2.2
-
-
 luc_freq <- data.frame(
   "LUC_from" =c("forest", "forest", "crop", "grassland", "other"),
   "LUC_to"   =c("urban", "crop", "grassland", "crop", "urban"),
@@ -101,22 +99,6 @@ for(i in 1:6) beta_fake[i,i] <- 0
 colnames(beta_fake) <- lc
 rownames(beta_fake) <- lc
 
-
-#### Real Data for use ####
-
 load("./Data/df_SA_notWeighted_2019-02-04.RData")
 load("./Data/df_SA_weighted_2019-02-04.RData")
 df_SA <- rbind(df_SA_notWeighted, df_SA_weighted)
-
-
-
-# sd_table <- data.frame(
-#   "Prior_standard_deviations" = names,
-#   "Value"         = c(sb_prior, sobs_prior, sl_prior, sbobs_prior),
-#   row.names       = c("sb_prior", "sobs_prior", "sl_prior", "sbobs_prior"),
-#   stringsAsFactors=F)
-
-# spatial_melt <- melt.data.frame(spatial_var,
-#                                 id.var="Year",
-#                                 variable_name="Land_Use")
-# colnames(spatial_melt)[3] <- "Spatial_Variability"
