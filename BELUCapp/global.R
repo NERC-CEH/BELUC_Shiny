@@ -26,6 +26,7 @@ library('reshape')
 library('leaflet')
 library('shinythemes')
 library('RColorBrewer')
+library('corrplot')
 
 
 #### labels and formatting ####

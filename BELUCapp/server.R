@@ -5,17 +5,6 @@
 # app presents results of BELUC under different parameter choices and shows key
 # summary statistics from the model outputs.
 
-library('shiny')
-library('reshape')
-library('ggplot2')
-library('shinyWidgets')
-library('shinythemes')
-library('htmltools')
-library('leaflet')
-library('markdown')
-library('knitr')
-library('plotly')
-library('RColorBrewer')
 options(show.error.messages = F)
 options(warn=-1)
 
