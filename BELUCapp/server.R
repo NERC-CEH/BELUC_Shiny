@@ -74,9 +74,14 @@ shinyServer(function(input, output, session) {
     striped=T, bordered=T, align='c', rownames=F)
 
   output$spatial_plot <- renderPlot({
+    if(input$relative_areas == "AbsA") {
+      yprint <- "Absolute growth and loss in hectares"
+    }else{
+      yprint <- "Year-on-year % growth and loss"
+    }
     
     p <- ggplot(df_ts(), aes(year)) +
-      ylab("Year-on-year % growth and loss") +
+      ylab(yprint) +
       scale_x_continuous(breaks = seq(1968,2020,by=4))
     if(input$show_bounds_check){
       p <- p + geom_ribbon(aes(ymin=m_G.rel_q025_BC,
@@ -134,6 +139,12 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  observeEvent(input$relative_areas,
+               {
+                 ranges$y <- c(-maxdf(), maxdf())
+                 ranges$x <- c(y_start()+1967, 2015)
+               })
+  
   df_table <- reactive({
     if(!is.null(input$LUC_slider)){
     df_SA %>% filter(
@@ -152,19 +163,28 @@ shinyServer(function(input, output, session) {
   y_start <- reactive(df_table()$backAsFarAs[1])
 
   df_ts <- reactive({
-    d <- lapply(8:13, function(i){
-      z <- melt(df_table()[1,i][[1]],
-                varnames=c("year", "land_cover"))
-      if (z$land_cover[1] %in% 1:6) z$land_cover <- lc[z$land_cover]
-      #z$land_cover[z$land_cover=="bare"] <- "other"
-      z$quant <- colnames(df_table()[i])
-      z
-    })
-    dx <- d %>%
-      do.call(rbind, .) %>%
-      cast(., year + land_cover ~ quant) %>%
-      filter(., land_cover %in% input$linechoices)
-    dx
+      if (input$relative_areas == "AbsA"){
+        colsel <- 8:13 #absolute area columns
+      }else{
+        colsel <- 14:19  # relative percentage change columns
+      }
+      colnam <- sapply(14:19, function(j){colnames(df_table()[j])})
+      print(colnam)
+      d <- lapply(1:6, function(i){
+        z <- melt(df_table()[1,colsel[i]][[1]],
+                  varnames=c("year", "land_cover"))
+        # swap factors for true values for lc and year. Original dat
+        if (z$land_cover[1] %in% 1:6) z$land_cover <- lc[z$land_cover]
+        if (1 %in% z$year) z$year <- z$year + y_start() + 1967
+        z$quant <- colnam[i]
+        z
+      })
+      #browser()
+      dx <- d %>%
+        do.call(rbind, .) %>%
+        cast(., year + land_cover ~ quant) %>%
+        filter(., land_cover %in% input$linechoices)
+      dx
   })
   
   maxdf <- reactive({ max(df_ts()[3:8])})

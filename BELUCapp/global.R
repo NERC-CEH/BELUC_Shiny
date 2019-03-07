@@ -105,9 +105,10 @@ rownames(beta_fake) <- lc
 
 #### Real Data for use ####
 
-load("./Data/df_SA_notWeighted_2019-02-04.RData")
-load("./Data/df_SA_weighted_2019-02-04.RData")
+load("./Data/df_SA_notWeighted_withareas_2019-03-02.RData")
+load("./Data/df_SA_weighted_withareas_2019-03-01.RData")
 df_SA <- rbind(df_SA_notWeighted, df_SA_weighted)
+
 
 
 

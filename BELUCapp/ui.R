@@ -5,7 +5,6 @@
 # app presents results of BELUC under different parameter choices and shows key
 # summary statistics from the model outputs.
 #
-# TODO: add to Lancaster Shiny server
 # TODO: act on feedback
 
 # options(show.error.messages = F)
@@ -91,6 +90,13 @@ shinyUI(##### TITLE SECTION #####
                    checkboxInput("show_bounds_check",
                                  "Show 95% quantile bounds?",
                                  T),
+                   
+                   radioButtons("relative_areas",
+                                "Figure scaling:",
+                                choiceNames = c("Absolute Area", "Percentage Change"),
+                                choiceValues = c("AbsA","PerC"),
+                                selected = "PerC",
+                                inline = TRUE),
                    
                    helpText(
                      "Drag box and double-click to zoom. Double-click without",

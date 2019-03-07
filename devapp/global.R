@@ -2,6 +2,8 @@
 # Global script which contains pre-computed values to use in the server and ui
 # scripts.
 #
+#  SCRATCH/DEV VERSION
+#
 ## Part of UKSCaPE Task 1.1 (Data Science Framework)
 # app presents results of BELUC under different parameter choices and shows key
 # summary statistics from the model outputs.
@@ -99,6 +101,8 @@ for(i in 1:6) beta_fake[i,i] <- 0
 colnames(beta_fake) <- lc
 rownames(beta_fake) <- lc
 
-load("./Data/df_SA_notWeighted_2019-02-04.RData")
-load("./Data/df_SA_weighted_2019-02-04.RData")
+load("./Data/df_SA_notWeighted_withareas_2019-03-02.RData")
+load("./Data/df_SA_weighted_withareas_2019-03-01.RData")
 df_SA <- rbind(df_SA_notWeighted, df_SA_weighted)
+
+

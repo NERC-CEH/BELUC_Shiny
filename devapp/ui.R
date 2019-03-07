@@ -1,6 +1,8 @@
 # Adam Griffin, 2018-12-14
 # UI script for Shiny app for Bayesian Estimation of Land Use Change
 #
+# SCRATCH/DEV VERSION
+#
 # Part of UKSCaPE Task 1.1 (Data Science Framework)
 # app presents results of BELUC under different parameter choices and shows key
 # summary statistics from the model outputs.
@@ -74,6 +76,12 @@ shinyUI(
              checkboxInput("show_bounds_check",
                            "Show 95% quantile bounds?",
                            T),
+             radioButtons("relative_areas",
+                           "Figure scaling:",
+                          choiceNames = c("Absolute Area", "Percentage Change"),
+                          choiceValues = c("AbsA","PerC"),
+                          selected = "PerC",
+                          inline = TRUE),
              
              #tableOutput("spatial_varA")
              helpText("Drag box and double-click to zoom. Double-click without selection to reset to automatic zoom. Use tickboxes below to show and hide landcover types. Shaded regions are 95% credible intervals."),
