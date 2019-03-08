@@ -169,7 +169,7 @@ shinyServer(function(input, output, session) {
         colsel <- 14:19  # relative percentage change columns
       }
       colnam <- sapply(14:19, function(j){colnames(df_table()[j])})
-      print(colnam)
+      #print(colnam)
       d <- lapply(1:6, function(i){
         z <- melt(df_table()[1,colsel[i]][[1]],
                   varnames=c("year", "land_cover"))

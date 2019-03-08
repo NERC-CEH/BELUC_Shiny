@@ -42,12 +42,9 @@ shinyUI(##### TITLE SECTION #####
             column(width = 4,
               wellPanel(
                 h3("Dataset choices"),
-                helpText(
-                  "Select the datasets you wish to include in this",
-                  "evaluation of the model. Currently not functional;",
-                  "parameters associated to unselected datasets are", 
-                  "fixed to their default value."
-                ),
+                helpText("Select the datasets you wish to include in this.",
+                         "Currently NOT FUNCTIONAL. Parameters associated to",
+                         "unselected datasets are fixed to their default value."),
                 checkboxGroupInput(
                   "dataset_checkbox",
                   "Datasets included:",
@@ -101,8 +98,8 @@ shinyUI(##### TITLE SECTION #####
                    helpText(
                      "Drag box and double-click to zoom. Double-click without",
                      "selection to reset to automatic zoom. Use tickboxes below",
-                     " to show and hide landcover types. Shaded regions are 95%",
-                     "credible intervals."
+                     " to show and hide landcover types. Shaded regions are 2.5%",
+                     " and 97.5% quantile bounds."
                    ),
                    
                    ## Key plot of gains and losses
@@ -147,6 +144,11 @@ shinyUI(##### TITLE SECTION #####
                        fluidPage(
                          fluidRow(
                            column(width = 12,
+                                  
+                helpText("This matrix plot shows the proportional changes",
+                         "between land use types: going from row i to column j",
+                         "Currently NON FUNCTIONAL."),
+                                  
                                   plotOutput("beta_visual")
                                   )
                            )
@@ -158,7 +160,8 @@ shinyUI(##### TITLE SECTION #####
                        fluidPage(
                          fluidRow(
                            column(width = 12,
-                                helpText("Map showing possible realisation?")
+                                helpText("Map showing possible realisation?",
+                                         "Currently NON FUNCTIONAL.")
                                 )
                            )
                          )

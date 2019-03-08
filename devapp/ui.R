@@ -35,8 +35,9 @@ shinyUI(
              wellPanel(
                
                h3("Dataset choices"),
-               helpText("Select the datasets you wish to include in this. Currently not functionl; parameters associated to unselected datasets are fixed to their default value.",
-                        "evaluation of the model."),
+               helpText("Select the datasets you wish to include in this.",
+                        "Currently NOT FUNCTIONAL. Parameters associated to",
+                        "unselected datasets are fixed to their default value."),
                checkboxGroupInput("dataset_checkbox",
                                   "Datasets included:",
                                   choiceNames = datasets_full,
@@ -123,6 +124,9 @@ shinyUI(
                 fluidPage(
                   fluidRow(
                     column(width = 12,
+                       helpText("This matrix plot shows the proportional changes",
+                                "between land use types: going from row i to column j",
+                                "Currently NON FUNCTIONAL."),
                            plotOutput("beta_visual")
                     ))))
       ) 
