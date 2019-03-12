@@ -128,10 +128,10 @@ shinyUI(##### TITLE SECTION #####
                      selected = lc[c(2, 1, 3, 6, 4, 5)]
                    ),
                    
-                   h3("Most frequent land use changes"),
+                   h3("Most frequent land use changes: NONFUNCTIONAL"),
                    tableOutput("luc_freqA"),
                    
-                   h3("Average proportion of land use types"),
+                   h3("Average proportion of land use types: NONFUNCTIONAL"),
                    tableOutput("av_persistA")
 
                  )
